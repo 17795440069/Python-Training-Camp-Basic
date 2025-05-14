@@ -8,13 +8,15 @@
 请补全下面的函数，实现发送HTTP请求并处理响应的功能。
 """
 
+import requests
+from requests.exceptions import RequestException
+
+
 def get_website_content(url):
     """
     发送GET请求获取网页内容
-    
     参数:
     - url: 目标网站URL
-    
     返回:
     - 包含响应信息的字典: 
       {
@@ -26,16 +28,27 @@ def get_website_content(url):
     # 请在下方编写代码
     # 使用requests.get()发送GET请求
     # 返回包含状态码、内容和头部信息的字典
+    try:
+        response = requests.get(url, timeout=10)
+        return {
+            'status_code': response.status_code,
+            'content': response.text,
+            'headers': dict(response.headers)
+        }
+    except RequestException:
+        return {
+            'status_code': None,
+            'content': '',
+            'headers': {}
+        }
     pass
 
 def post_data(url, data):
     """
     发送POST请求提交数据
-    
     参数:
     - url: 目标网站URL
     - data: 要提交的数据字典
-    
     返回:
     - 包含响应信息的字典:
       {
@@ -47,4 +60,26 @@ def post_data(url, data):
     # 请在下方编写代码
     # 使用requests.post()发送POST请求
     # 返回包含状态码、响应JSON和成功标志的字典
+    try:
+        response = requests.post(url, data=data, timeout=10)
+        response_json = response.json() if response.headers.get('Content-Type', '').startswith(
+            'application/json') else None
+        return {
+            'status_code': response.status_code,
+            'response_json': response_json,
+            'success': 200 <= response.status_code < 300
+        }
+    except RequestException:
+        return {
+            'status_code': None,
+            'response_json': None,
+            'success': False
+        }
+    except ValueError:
+        # 捕获JSON解析错误
+        return {
+            'status_code': response.status_code if 'response' in locals() else None,
+            'response_json': None,
+            'success': 200 <= (response.status_code if 'response' in locals() else 0) < 300
+        }
     pass 

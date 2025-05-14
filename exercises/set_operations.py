@@ -20,4 +20,13 @@ def student_set_operations(set1, set2, operation):
     - 集合操作的结果
     """
     # 请在下方编写代码
+
+    if operation == "union":
+        return set1.union(set2)
+    elif operation == "intersection":
+        # 找出两个集合共有的学生id
+        return set1.intersection(set2)
+    elif operation == "difference":
+        # 找出在set1中存在但不在set2中的学生id
+        return set1-set2
     pass

@@ -19,6 +19,7 @@ def extract_keywords(text):
     """
     # 请在下方编写代码
     # 使用split()方法分割字符串，返回关键词列表
+    return text.strip().split()
     pass
 
 def parse_csv_line(csv_line):
@@ -33,6 +34,38 @@ def parse_csv_line(csv_line):
     """
     # 请在下方编写代码
     # 使用split()方法分割CSV行，返回字段列表
+    fields = csv_line.split(',')
+    result = []
+    current = []
+    in_quotes = False
+
+    for field in fields:
+        stripped = field.strip()
+        if in_quotes:
+            current.append(field)
+            if stripped.endswith('"'):
+                # 合并引号内的字段并清理格式
+                merged = ','.join(current)
+                # 去除首尾引号并处理转义引号
+                if merged.startswith('"') and merged.endswith('"'):
+                    merged = merged[1:-1].replace('""', '"')
+                result.append(merged)
+                current = []
+                in_quotes = False
+        else:
+            if stripped.startswith('"'):
+                in_quotes = True
+                # 去除起始引号并保留内容
+                current.append(field[1:])
+            else:
+                result.append(field)
+
+    # 处理未闭合的引号（假设输入合法）
+    if current:
+        merged = ','.join(current).replace('""', '"')
+        result.append(merged)
+
+    return result
     pass
 
 def extract_name_and_domain(email):
@@ -47,4 +80,8 @@ def extract_name_and_domain(email):
     """
     # 请在下方编写代码
     # 使用split()方法分割电子邮件地址，返回用户名和域名的元组
+    parts = email.split('@')
+    if len(parts) != 2:
+        raise ValueError("Invalid email format")
+    return (parts[0], parts[1])
     pass 
